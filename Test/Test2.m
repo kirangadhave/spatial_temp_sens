@@ -51,25 +51,10 @@ if ~eyejoytrack('holdfix', fixation_point, fixation_window, interval)
 end
 
 % Show objects
-toggleobject([o1 o2]);
+toggleobject(o1);
+toggleobject(o2);
 if ~eyejoytrack('holdfix', fixation_point, fixation_window, hold_on_fix)
    trialerror(3);
    toggleobject([fixation_point o1 o2]);
    return;
 end
-
-disp('Press Key');
-scancode = getkeypress(2000);
-
-% Left for 1.
-if scancode == 203
-   disp(1);
-   trialerror(0);
-   return;
-elseif scancode == 205
-    disp(2);
-    trialerror(0);
-    return;
-end
-
-trialerror(1);
