@@ -1,4 +1,4 @@
-%% Calib timing file , @author mbparsa, @version 11-07-2014
+%% Calib timing file , @author kirang/shuvrajitm, @version 02-05-2018
 % select block 1 if you want to stimulate
 %%-------------------------------------------------------------------------
 %% Variables, experimenter can either edit variable by using "V" while the task is paused on ML or edit variable in the next section 
@@ -61,7 +61,21 @@ if ~eyejoytrack('holdfix', fixation_point, fixation_window, hold_on_fix)
 end
 
 disp('Press Key');
-scancode = getkeypress(2000);
+scancode = '';
+flag = 1;
+time = 0;
+while(flag)
+    time = time + 50;
+    scancode = getkeypress(50);
+    fix_held = eyejoytrack('holdfix', fixation_point, fixation_window, 50);
+    if (time > 2000 | scancode)
+       flag = 0; 
+    end
+    if ~fix_held
+        trialerror(BRK_FIXATION);
+        return;
+    end
+end
 % Left for 1.
 if scancode ~= 203 & scancode ~= 205
    trialerror(NO_RESPONSE);
@@ -95,4 +109,3 @@ if TrialRecord.CurrentCondition == 2
     end
 end
 return;
-%%
