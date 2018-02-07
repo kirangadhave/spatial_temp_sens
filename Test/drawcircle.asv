@@ -1,6 +1,0 @@
-function id = drawcircle(Circ, isActivated=0, position)
-    id_ = mgladdcircle(Circ.Color, Circ.Size);      % add a circle
-    mglactivategraphic([id id2],false)
-    mglsetproperty(id_,'origin',[1920/2 1080/2]);              % move the circle to the center
-    id = id_;
-end

@@ -22,30 +22,41 @@ ABORT           = 9;
 % TaskObjects from condition files
 FIX_PNT = 1;
 
-% Stimuli to generate dynamically.
-Point1.Type = 'Circle';
-Point1.Size = [0, 0];
+%%% Stimuli to generate dynamically.
+
+% Stimulus Object 1
+Point1.Size = [10, 10];
 Point1.Position = [0, 0];
-Point1.Color = [0 0 0; 0 0 0];
+Point1.Color = [1 1 1; 1 1 1];
 
-Point2.Type = 'Circle';
-Point2.Size = [0, 0];
+% Stimulus Object 
+Point2.Size = [10, 10];
 Point2.Position = [0, 0];
-Point2.Color = [0 0 0; 0 0 0];
+Point2.Color = [1 1 1; 1 1 1];
 
+Point1.Size = [10 10];
+Point1.Position = [SCREEN_WIDTH/2 SCREEN_HEIGHT/2];
+Point1.Color = [1 0 0; 1 0 0];
+
+object1 = drawcircle(Point1, true);
+
+new_pos = [10 10];
+
+moveobject(object1, new_pos);
+return;
 %%-------------------------------------------------------------------------
 %% Edit variables
 % Location parameters
 disp('Starting Experiment');
 fixation_window=2;                                                                                                        
 
-set_iti(interval);
 
 %Timing and check points
 wait_for_fix=4000;                                                                                                          
 hold_on_fix=1500;                                                                                                         
 interval=3000;                                                                                                          
 
+set_iti(interval);
 %Task
 toggleobject(fixation_point, 'status', 'on');
 
@@ -127,3 +138,15 @@ if TrialRecord.CurrentCondition == 2
     end
 end
 return;
+%% 
+function id = drawcircle(Circ, isActivated)
+    id_ = mgladdcircle(Circ.Color, Circ.Size);      % add a circle
+    mglsetproperty(id_,'origin', Circ.Position);              % move the circle to the center
+    id = id_;
+end
+
+function moveobject(obj_id, pos)
+    mglactivategraphic(obj_id,false);
+    mglsetproperty(obj_id,'origin', pos);
+    mglactivategraphic(obj_id, true);
+end
