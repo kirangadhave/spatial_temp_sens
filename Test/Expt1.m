@@ -3,40 +3,58 @@
 %%-------------------------------------------------------------------------
 %% Variables, experimenter can either edit variable by using "V" while the task is paused on ML or edit variable in the next section 
 % editable('fixationWindow', 'wait4fix','holdonFix','delayAfterReward','interval','goodboy');
+%%-------------------------------------------------------------------------
+%% Screen Size : Enter the same as selected in Monkey Logic 2
+SCREEN_WIDTH    = 1920;
+SCREEN_HEIGHT   = 1080;
+%% Error Codes to be used for trial errors. As per documentation.
+CORRECT         = 0;
+NO_RESPONSE     = 1; 
+BRK_FIXATION    = 3;
+NO_FIXATION     = 4;
+EARL_RESPONSE   = 5;
+INCORR_RESPONSE = 6;
+LEVER_BREAK     = 7;
+IGNORED         = 8;
+ABORT           = 9;
+%% Stimulii
+
+% TaskObjects from condition files
+FIX_PNT = 1;
+
+% Stimuli to generate dynamically.
+Point1.Type = 'Circle';
+Point1.Size = [0, 0];
+Point1.Position = [0, 0];
+Point1.Color = [0 0 0; 0 0 0];
+
+Point2.Type = 'Circle';
+Point2.Size = [0, 0];
+Point2.Position = [0, 0];
+Point2.Color = [0 0 0; 0 0 0];
 
 %%-------------------------------------------------------------------------
 %% Edit variables
 % Location parameters
-disp('Starting expt');
-fixation_window=3;                                                                                                        
+disp('Starting Experiment');
+fixation_window=2;                                                                                                        
+
+set_iti(interval);
 
 %Timing and check points
 wait_for_fix=4000;                                                                                                          
 hold_on_fix=1500;                                                                                                         
 interval=3000;                                                                                                          
 
-% Error Codes
-CORRECT = 0;
-NO_RESPONSE = 1; 
-BRK_FIXATION = 3;
-NO_FIXATION = 4;
-EARL_RESPONSE = 5;
-INCORR_RESPONSE = 6;
-LEVER_BREAK = 7;
-IGNORED = 8;
-ABORT = 9;
-
-% Objects : Images and stimulus (Do not change these!)
-fixation_point=1;                                                                                                    
-o1 = 2;
-o2 = 3;
-phd_point = 4;
-
-set_iti(interval);
-
 %Task
 toggleobject(fixation_point, 'status', 'on');
 
+
+id = mgladdcircle([1 1 1; 1 1 1],[10 10]);        % add a circle
+mglsetproperty(id,'origin',[1920/2 1080/2]);              % move the circle to the center
+
+% toggleobject(fixation_point, 'status', 'on');
+return;
 % Acquire Fixation
 if ~eyejoytrack('acquirefix', fixation_point, fixation_window, wait_for_fix)
    trialerror(NO_FIXATION); 

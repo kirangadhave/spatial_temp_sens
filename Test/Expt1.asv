@@ -1,32 +1,28 @@
-%% Calib timing file , @author mbparsa, @version 11-07-2014
+%% Calib timing file , @author kirang/shuvrajitm, @version 02-05-2018
 % select block 1 if you want to stimulate
 %%-------------------------------------------------------------------------
 %% Variables, experimenter can either edit variable by using "V" while the task is paused on ML or edit variable in the next section 
 % editable('fixationWindow', 'wait4fix','holdonFix','delayAfterReward','interval','goodboy');
-
 %%-------------------------------------------------------------------------
-%% Edit variables
-% Location parameters
-disp('Starting expt');
-fixation_window=3;                                                                                                        
-
-%Timing and check points
-wait_for_fix=4000;                                                                                                          
-hold_on_fix=1500;                                                                                                         
-interval=3000;                                                                                                          
-
-% Error Codes
-CORRECT = 0;
-NO_RESPONSE = 1; 
-BRK_FIXATION = 3;
-NO_FIXATION = 4;
-EARL_RESPONSE = 5;
+%% Screen Size : Enter the same as selected in Monkey Logic 2
+SCREEN_WIDTH    = 1920;
+SCREEN_HEIGHT   = 1080;
+%% Error Codes to be used for trial errors. As per documentation.
+CORRECT         = 0;
+NO_RESPONSE     = 1; 
+BRK_FIXATION    = 3;
+NO_FIXATION     = 4;
+EARL_RESPONSE   = 5;
 INCORR_RESPONSE = 6;
-LEVER_BREAK = 7;
-IGNORED = 8;
-ABORT = 9;
+LEVER_BREAK     = 7;
+IGNORED         = 8;
+ABORT           = 9;
+%% Stimulii
 
-% Objects : Images and stimulus (Do not change these!)
+% TaskObjects from condition files
+FIX_PNT = 1;
+
+% Stimuli to generate d
 fixation_point=1;                                                                                                    
 o1 = 2;
 o2 = 3;
@@ -35,24 +31,26 @@ phd_point = 4;
 set_iti(interval);
 
 
-disp('Press Key');
-scancode = '';
-flag = 1;
-time = 0;
-while(flag)
-    time = time + 50;
-    scancode = getkeypress(50);
-    
-    if time > 2000 | scancode
-       flag = 0; 
-    end
-end
-disp(scancode);
-return;
+%%-------------------------------------------------------------------------
+%% Edit variables
+% Location parameters
+disp('Starting Experiment');
+fixation_window=2;                                                                                                        
+
+%Timing and check points
+wait_for_fix=4000;                                                                                                          
+hold_on_fix=1500;                                                                                                         
+interval=3000;                                                                                                          
 
 %Task
 toggleobject(fixation_point, 'status', 'on');
 
+
+id = mgladdcircle([1 1 1; 1 1 1],[10 10]);        % add a circle
+mglsetproperty(id,'origin',[1920/2 1080/2]);              % move the circle to the center
+
+% toggleobject(fixation_point, 'status', 'on');
+return;
 % Acquire Fixation
 if ~eyejoytrack('acquirefix', fixation_point, fixation_window, wait_for_fix)
    trialerror(NO_FIXATION); 
@@ -83,12 +81,15 @@ time = 0;
 while(flag)
     time = time + 50;
     scancode = getkeypress(50);
-    
-    if time > 2000
+    fix_held = eyejoytrack('holdfix', fixation_point, fixation_window, 50);
+    if (time > 2000 | scancode)
        flag = 0; 
     end
+    if ~fix_held
+        trialerror(BRK_FIXATION);
+        return;
+    end
 end
-
 % Left for 1.
 if scancode ~= 203 & scancode ~= 205
    trialerror(NO_RESPONSE);
