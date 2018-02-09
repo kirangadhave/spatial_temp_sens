@@ -141,7 +141,8 @@ return;
 %% 
 function id = drawcircle(Circ, isActivated)
     id_ = mgladdcircle(Circ.Color, Circ.Size);      % add a circle
-    mglsetproperty(id_,'origin', Circ.Position);              % move the circle to the center
+    mglsetproperty(id_,'origin', Circ.Position);
+    mglactivategraphic(obj_id, isActivated);
     id = id_;
 end
 
