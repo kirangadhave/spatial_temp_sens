@@ -23,7 +23,7 @@ ABORT           = 9;
 TDS.TrialNumber = 0;
 TDS.Distances = 0;
 %% VARIABLES
-TOTAL_NUM_TRIALS = 20;
+TOTAL_NUM_TRIALS = 5;
 %% Stimulii
 
 Sucess = -2;
@@ -79,13 +79,21 @@ if ~eyejoytrack('holdfix', fixation_point, fixation_window, interval)
 end
 disp('Hold Fix ended');
 
-if TrialRecord.IPT > 0
-    if TrialRecord.IPT > 2
-       TrialRecord.IPT_mod = 0.5; 
-    elseif TrialRecord.IPT < 2 & TrialRecord.IPT > 1.3
-       TrialRecord.IPT_mod = 0.1;     
-    elseif TrialRecord.IPT <= 1.3
-        TrialRecord.IPT_mod = 0.05;
+if TrialRecord.IPT >= 0
+%     if TrialRecord.IPT > 2
+%        TrialRecord.IPT_mod = 0.5; 
+%     elseif TrialRecord.IPT < 2 & TrialRecord.IPT > 1.3
+%        TrialRecord.IPT_mod = 0.1;     
+%     elseif TrialRecord.IPT <= 1.3
+%         TrialRecord.IPT_mod = 0.05;
+%     end
+    
+    if TrialRecord.CurrentTrialNumber <= 6
+        TrialRecord.IPT_mod = 0.5;
+    elseif TrialRecord.CurrentTrialNumber > 6 && TrialRecord.CurrentTrialNumber <=14
+        TrialRecord.IPT_mod = 0.25;
+    else
+        TrialRecord.IPT_mod = 0.1;
     end
     
     if TrialRecord.CurrentTrialNumber > 1
@@ -196,12 +204,13 @@ elseif scancode == 205
    TrailRecord.Success = 0;
 end
 
-if TrialRecord.CurrentTrialNumber == TOTAL_NUM_TRIALS
-    figure
-    hold on
-    plot(TrialRecord.TRIAL_DS.TrialNumber, TrialRecord.TRIAL_DS.Distances);
-    figure
-end
+disp('Plotting');
+figure
+hold on
+plot(TrialRecord.TRIAL_DS.TrialNumber, TrialRecord.TRIAL_DS.Distances);
+ylim([0 5])
+figure
+
 return;
 %% 
 function id = drawcircle(Circ, isActivated)
