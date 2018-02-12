@@ -22,8 +22,6 @@ ABORT           = 9;
 %% TRIAL_DS
 TDS.TrialNumber = 0;
 TDS.Distances = 0;
-%% VARIABLES
-TOTAL_NUM_TRIALS = 20;
 %% Stimulii
 
 Sucess = -2;
@@ -37,12 +35,12 @@ fixation_point = 1;
 % Stimulus Object 1
 Point1.Size = [10, 10];
 Point1.Position = [0, 0];
-Point1.Color = [0 0 0; 0 0 0];
+Point1.Color = [1 1 1; 1 1 1];
 
 % Stimulus Object 2
 Point2.Size = [10, 10];
 Point2.Position = [0, 0];
-Point2.Color = [0 0 0; 0 0 0];
+Point2.Color = [1 1 1; 1 1 1];
 
 % Hidden Object 3
 Point3.Size = [10 10];
@@ -65,19 +63,19 @@ set_iti(interval);
 toggleobject(fixation_point, 'status', 'on');
 
 % % Acquire Fixation
-if ~eyejoytrack('acquirefix', fixation_point, fixation_window, wait_for_fix)
-   trialerror(NO_FIXATION); 
-   return;
-end
-disp('Fix Acquired');
-
-disp('Hold Fix Started');
-% Check for fixation hold
-if ~eyejoytrack('holdfix', fixation_point, fixation_window, interval)
-   trialerror(BRK_FIXATION);
-   return;
-end
-disp('Hold Fix ended');
+% if ~eyejoytrack('acquirefix', fixation_point, fixation_window, wait_for_fix)
+%    trialerror(NO_FIXATION); 
+%    return;
+% end
+% disp('Fix Acquired');
+% 
+% disp('Hold Fix Started');
+% % Check for fixation hold
+% if ~eyejoytrack('holdfix', fixation_point, fixation_window, interval)
+%    trialerror(BRK_FIXATION);
+%    return;
+% end
+% disp('Hold Fix ended');
 
 if TrialRecord.IPT > 0
     if TrialRecord.IPT > 2
@@ -106,40 +104,29 @@ if TrialRecord.IPT > 0
 end
 
 
-if class(TrialRecord.TRIAL_DS) == 'double'
-   TrialRecord.TRIAL_DS = TDS;
-   TrialRecord.TRIAL_DS.TrialNumber = [TrialRecord.CurrentTrialNumber];
-   TrialRecord.TRIAL_DS.Distances = [TrialRecord.IPT];
-else
-    TrialRecord.TRIAL_DS.TrialNumber = [TrialRecord.TRIAL_DS.TrialNumber, TrialRecord.CurrentTrialNumber];
-   TrialRecord.TRIAL_DS.Distances = [TrialRecord.TRIAL_DS.Distances, TrialRecord.IPT];
+if TrialRecord.TRIAL_DS == -1
+   TrialRecord.TRIAL_ 
 end
 
-disp(TrialRecord.TRIAL_DS.TrialNumber);
-disp(TrialRecord.TRIAL_DS.Distances);
 
 disp('Point displayed');
 [ox, oy] = get_actual_pos(0, 0);
 Point3.Position = [ox, oy];
 
-[p1, p2, p3, p4] = get_corners([5, 5], TrialRecord.IPT);
+[p1, p2, p3, p4] = get_corners([10, 10], TrialRecord.IPT);
 Point1.Position = p1;
 Point2.Position = p3;
 
 drawcircle(Point1, true);
 drawcircle(Point2, true);
-pause(0.025)
+pause(0.5)
 mglactivategraphic(0, false);
 drawcircle(Point3, true);
-
 Point1.Position = p2;
 Point2.Position = p4;
-% pause(0.025)
 drawcircle(Point1, true);
 drawcircle(Point2, true);
-pause(0.25)
-mglactivategraphic(0, false);
-drawcircle(Point3, true);
+
 disp('Point display done');
 % Show objects
 % toggleobject([o1 o2], 'status', 'on');
@@ -157,10 +144,10 @@ tim_del = 10;
 while(flag)
     time = time + tim_del;
     scancode = getkeypress(tim_del/2);
-    fix_held = eyejoytrack('holdfix', fixation_point, fixation_window, tim_del/2);
+    %fix_held = eyejoytrack('holdfix', fixation_point, fixation_window, tim_del/2);
 %     disp('Key and time: ');
 %     disp(temp);
-    if time > 5000 | scancode > 0
+    if time > 10000 | scancode > 0
        flag = 0; 
     end
     
@@ -196,12 +183,6 @@ elseif scancode == 205
    TrailRecord.Success = 0;
 end
 
-if TrialRecord.CurrentTrialNumber == TOTAL_NUM_TRIALS
-    figure
-    hold on
-    plot(TrialRecord.TRIAL_DS.TrialNumber, TrialRecord.TRIAL_DS.Distances);
-    figure
-end
 return;
 %% 
 function id = drawcircle(Circ, isActivated)
@@ -240,7 +221,7 @@ end
 function [p1, p2, p3, p4] = get_corners(list, x_len)
     x = list(1);
     y = list(2);
-    y_len = 3 - x_len;
+    y_len = 6 - x_len;
     
     p1 = [x - x_len/2, y - y_len/2];
     p2 = [x + x_len/2, y - y_len/2];
