@@ -1,4 +1,4 @@
 Condition		Info			Frequency	Block	Timing File	TaskObject#1					TaskObject#2
-1				'' 				1 			1		Expt4		Crc(0.5, [1 0 0], 1, 0, 0)		Crc(0.1, [1 0 0], 1, 5, 0)
-2				'' 				1 			2		Expt4		Crc(0.5, [1 0 0], 1, 0, 0)		Crc(0.1, [1 0 0], 1, 5, 0)
-3				'' 				1 			3		Expt4		Crc(0.5, [1 0 0], 1, 0, 0)		Crc(0.1, [1 0 0], 1, 5, 0)
+1				'' 				1 			1		Expt4		Crc(0.1, [1 0 0], 1, 0, 0)		Crc(0.1, [1 0 0], 1, 5, 0)
+2				'' 				1 			2		Expt4		Crc(0.1, [1 0 0], 1, 0, 0)		Crc(0.1, [1 0 0], 1, 5, 0)
+3				'' 				1 			3		Expt4		Crc(0.1, [1 0 0], 1, 0, 0)		Crc(0.1, [1 0 0], 1, 5, 0)
