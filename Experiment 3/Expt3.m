@@ -115,8 +115,8 @@ else
    TrialRecord.TRIAL_DS.Distances = [TrialRecord.TRIAL_DS.Distances, TrialRecord.IPT];
 end
 
-disp(TrialRecord.TRIAL_DS.TrialNumber);
-disp(TrialRecord.TRIAL_DS.Distances);
+%disp(TrialRecord.TRIAL_DS.TrialNumber);
+%disp(TrialRecord.TRIAL_DS.Distances);
 
 disp('Point displayed');
 [ox, oy] = get_actual_pos(0, 0);
@@ -131,6 +131,8 @@ drawcircle(Point2, true);
 pause(0.028)
 mglactivategraphic(0, false);
 drawcircle(Point3, true);
+
+
 
 Point1.Position = p2;
 Point2.Position = p4;
