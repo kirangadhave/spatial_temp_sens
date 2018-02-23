@@ -82,17 +82,14 @@ if TrialRecord.CurrentTrialNumber > 1
            end
        else
            if abs(x) >= 2 || abs(y) >= 2
-              fix_broken_idx = idx; 
+              fix_broken_idx = idx;
               break;
            end
        end
     end
     if fix_broken_idx ~= 0
-        time_diff = fix_broken_idx - StimTime*1000;
-        t_rec = [TrialRecord.CurrentTrialNumber - 1, time_diff];
-        disp(t_rec);
-        TrialRecord.TRIAL_DS.Eye_Stim_Data = [TrialRecord.TRIAL_DS.Eye_Stim_Data; t_rec];
-    end
+    time_diff = fix_broken_idx - StimTime*1000;
+    TrialRecord.TRIAL_DS.Eye_Stim_Data = [TrialRecord.TRIAL_DS.Eye_Stim_Data time_diff];
     disp(TrialRecord.TRIAL_DS.Eye_Stim_Data);
 end
 %% Stimulii
