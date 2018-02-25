@@ -2,7 +2,7 @@ clear
 addpath('fwdcodesiusedtoextractsaccadeandalsotoanalyzerea');
 close all
 
-X = mlread('180224_test_Expt4(6).bhv2');
+X = mlread('180224_test_Expt4(7).bhv2');
 
 flag = zeros(1,31);
 for i = 1:size(X,2)
@@ -63,10 +63,31 @@ xlabel('Saccade Onset(ms)');
 % Vert',... 25, 'C3 - Horz',... 26, 'C3 - Vert')
 
 cond_count = zeros(1, 30);
-
+tri_con = nan(1, size(M,2));
+tri_resp = nan(1, size(M,2));
 for i = 1:size(M,2)
     con = M(i).BehavioralCodes.CodeNumbers(M(i).BehavioralCodes.CodeNumbers > 20);
     cond_count(con) = cond_count(con) + 1;
+    switch con
+        case 21
+            tri_con(i) = 1;
+            tri_resp(i) = 0;
+        case 22
+            tri_con(i) = 1;
+            tri_resp(i) = 1;
+        case 23
+            tri_con(i) = 2;
+            tri_resp(i) = 0;
+        case 24
+            tri_con(i) = 2;
+            tri_resp(i) = 1;
+        case 25
+            tri_con(i) = 3;
+            tri_resp(i) = 0;
+        case 26
+            tri_con(i) = 3;
+            tri_resp(i) = 1;
+    end
 end
 
 c1_hor = cond_count(21)/(cond_count(21) + cond_count(22));
@@ -77,3 +98,18 @@ subplot(1,3,3);
 bar([-0.25 0 0.25], [c1_hor, c2_hor, c3_hor]);
 xlabel('Conditions');
 ylabel('Horizontal Response Percentage')
+
+
+fp2sacon = sac_info(:,1) - vso';
+output = [fp2sacon, tri_con', tri_resp'];
+
+eye_time = sac_info(:,1);
+
+eye_mat = zeros([size(y,1), 301, size(y,3)]);
+for i = 1:size(eye_mat, 1)
+    if isnan(eye_time(i))
+        start = eye_time(i)-150;
+        end_ =eye_time(i)+150;
+       eye_mat(i,:,:) = y(i,start:end_,:);
+    end
+end
