@@ -45,7 +45,7 @@ Point2.Position = [0, 0];
 Point2.Color = [0 0 0; 0 0 0];
 
 % Hidden Object 3
-Point3.Size = [10 10];
+Point3.Size = [0.1 0.1];
 Point3.Position = [0 0];
 Point3.Color = [1 0 0; 1 0 0];
 %%-------------------------------------------------------------------------
@@ -64,6 +64,65 @@ set_iti(interval);
 %Task
 toggleobject(fixation_point, 'status', 'on');
 
+% % % Acquire Fixation
+% if ~eyejoytrack('acquirefix', fixation_point, fixation_window, wait_for_fix)
+%    trialerror(NO_FIXATION); 
+%    return;
+% end
+% disp('Fix Acquired');
+% 
+% disp('Hold Fix Started');
+% % Check for fixation hold
+% if ~eyejoytrack('holdfix', fixation_point, fixation_window, interval)
+%    trialerror(BRK_FIXATION);
+%    return;
+% end
+% disp('Hold Fix ended');
+
+if TrialRecord.IPT >= 0
+     if TrialRecord.CurrentTrialNumber <= 10
+        TrialRecord.IPT_mod = 0.5;
+    elseif TrialRecord.CurrentTrialNumber > 10 && TrialRecord.CurrentTrialNumber <= 20
+        TrialRecord.IPT_mod = 0.25;
+    else
+        TrialRecord.IPT_mod = 0.1;
+    end
+    
+    if TrialRecord.CurrentTrialNumber > 1
+       if TrialRecord.TrialErrors(TrialRecord.CurrentTrialNumber - 1) == 0
+           TrialRecord.Success = 1;
+       elseif TrialRecord.TrialErrors(TrialRecord.CurrentTrialNumber - 1) == 6
+           TrialRecord.Success = 0;
+       end
+    end
+    if TrialRecord.IPT_mod < TrialRecord.IPT 
+        if TrialRecord.Success == 1
+           if TrialRecord.IPT + TrialRecord.IPT_mod < 3 
+                TrialRecord.IPT = TrialRecord.IPT + TrialRecord.IPT_mod;
+           end
+       elseif TrialRecord.Success == 0
+        if (TrialRecord.IPT - TrialRecord.IPT_mod) > 0
+            TrialRecord.IPT = TrialRecord.IPT - TrialRecord.IPT_mod;
+        end
+    end
+        disp(TrialRecord.Success);
+        disp(TrialRecord.IPT);
+    end
+end
+
+time_stamp = strsplit(char(datetime('now')));
+time_stamp = time_stamp{1};
+x_file = strcat(time_stamp, 'x_dist.mat');
+
+if ~exist(x_file)
+    t = TrialRecord.IPT;
+   save(x_file, 't'); 
+else
+   load(x_file);
+   t = [t TrialRecord.IPT];
+   save(x_file, 't');
+end
+
 % % Acquire Fixation
 if ~eyejoytrack('acquirefix', fixation_point, fixation_window, wait_for_fix)
    trialerror(NO_FIXATION); 
@@ -79,31 +138,6 @@ if ~eyejoytrack('holdfix', fixation_point, fixation_window, interval)
 end
 disp('Hold Fix ended');
 
-if TrialRecord.IPT >= 0
-     if TrialRecord.CurrentTrialNumber <= 6
-        TrialRecord.IPT_mod = 0.5;
-    elseif TrialRecord.CurrentTrialNumber > 6 && TrialRecord.CurrentTrialNumber <=14
-        TrialRecord.IPT_mod = 0.25;
-    else
-        TrialRecord.IPT_mod = 0.1;
-    end
-    
-    if TrialRecord.CurrentTrialNumber > 1
-       if TrialRecord.TrialErrors(TrialRecord.CurrentTrialNumber - 1) == 0
-           TrialRecord.Success = 1;
-       elseif TrialRecord.TrialErrors(TrialRecord.CurrentTrialNumber - 1) == 6
-           TrialRecord.Success = 0;
-       end
-    end
-    
-    if TrialRecord.Success == 1
-       TrialRecord.IPT = TrialRecord.IPT + TrialRecord.IPT_mod;
-    elseif TrialRecord.Success == 0
-        TrialRecord.IPT = TrialRecord.IPT - TrialRecord.IPT_mod;
-    end
-    disp(TrialRecord.Success);
-    disp(TrialRecord.IPT);
-end
 
 
 if class(TrialRecord.TRIAL_DS) == 'double'
@@ -197,12 +231,12 @@ elseif scancode == 205
    TrailRecord.Success = 0;
 end
 
-disp('Plotting');
-figure
-hold on
-plot(TrialRecord.TRIAL_DS.TrialNumber, TrialRecord.TRIAL_DS.Distances);
-ylim([0 5])
-figure
+% disp('Plotting');
+% figure
+% hold on
+% plot(TrialRecord.TRIAL_DS.TrialNumber, TrialRecord.TRIAL_DS.Distances);
+% ylim([0 5])
+% figure
 
 return;
 %% 

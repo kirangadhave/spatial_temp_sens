@@ -8,7 +8,12 @@
 tic
 Sucess = -2;
 IPT = 4;
-
+bhv_code(...
+1,'Fixation On',...
+2, 'Fixation Off',...
+3, 'Stimulus On',...
+4, 'Target Off',...
+);
 %%-------------------------------------------------------------------------
 %% Screen Size : Enter the same as selected in Monkey Logic 2
 SCREEN_WIDTH    = 1920;
@@ -32,66 +37,16 @@ TDS.Distances = 0;
 % TDS.IPT_mod = -1;
 %% VARIABLES
 TOTAL_NUM_TRIALS = 20;
-FIXATION_WINDOW = 2;  
+FIXATION_WINDOW = 2.5;  
 THRESHOLD_X = 1.25;
 TOTAL_SUM = 3;
+MAX_RXN_TIME = 5000;
 %% TIMING
 WAIT_FOR_FIX    = 4000;                                                                                                          
 HOLD_FIX        = 1500;                                                                                                         
 INTERVAL        = 2000;                                                                                                          
 
 STIM_INTERVAL   = 0.251;
-%% Plot
-
-%% Plot
-% disp(TrialRecord.CurrentTrialNumber);
-if TrialRecord.CurrentTrialNumber == 16
-    zero_hor_per    = TrialRecord.TRIAL_DS.ZERO/TrialRecord.TRIAL_DS.ZERO_TOT;
-    plus_hor_per    = TrialRecord.TRIAL_DS.PLUS/TrialRecord.TRIAL_DS.PLUS_TOT;
-    minus_hor_per   = TrialRecord.TRIAL_DS.MINUS/TrialRecord.TRIAL_DS.MINUS_TOT;
-%     disp([zero_hor_per, plus_hor_per, minus_hor_per]);
-%     disp([
-%     TrialRecord.TRIAL_DS.ZERO,
-%     TrialRecord.TRIAL_DS.PLUS,
-%     TrialRecord.TRIAL_DS.MINUS,
-%     TrialRecord.TRIAL_DS.ZERO_TOT,
-%     TrialRecord.TRIAL_DS.PLUS_TOT,
-%     TrialRecord.TRIAL_DS.MINUS_TOT,    
-%     ]);
-    figure
-    hold on
-    bar([0, 0.25, -0.25], [zero_hor_per, plus_hor_per, minus_hor_per]);
-    ylim([0 1])
-    figure
-    return;
-end
-
-if TrialRecord.CurrentTrialNumber > 1
-    EyeData = TrialRecord.LastTrialAnalogData.Eye;
-    StimTime = TrialRecord.TRIAL_DS.LastTrialStimTime;
-    EyeData_size = size(EyeData);
-    fix_broken_idx = 0;
-    fix_acc = 0;
-    for idx = 1:EyeData_size(1)
-       temp = EyeData(idx,:);
-       x = temp(1);
-       y = temp(2);
-       if ~fix_acc
-           if abs(x) < 2 || abs(y) < 2
-               fix_acc = 1;
-           end
-       else
-           if abs(x) >= 2 || abs(y) >= 2
-              fix_broken_idx = idx;
-              break;
-           end
-       end
-    end
-    if fix_broken_idx ~= 0
-    time_diff = fix_broken_idx - StimTime*1000;
-    TrialRecord.TRIAL_DS.Eye_Stim_Data = [TrialRecord.TRIAL_DS.Eye_Stim_Data time_diff];
-    disp(TrialRecord.TRIAL_DS.Eye_Stim_Data);
-end
 %% Stimulii
 % TaskObjects from condition files
 FP1 = 1;
@@ -112,8 +67,8 @@ disp('Starting Experiment');
 set_iti(INTERVAL);
 %% Get Fixation and Hold
 
-drawFixation([FP1, FP2]);
-
+% drawFixation([FP1, FP2]);
+toggleobject([FP1, FP2], 'status', 'on', 'eventmarker', 1);
 % Get fixation on FP1
 if ~eyejoytrack('acquirefix', FP1, FIXATION_WINDOW, WAIT_FOR_FIX)
     trialerror(NO_FIXATION);
@@ -160,48 +115,34 @@ Point1.Position = p1;
 Point2.Position = p3;
 
 % Hide Fixation Point 1
-hideFixation(FP1);
-% [something, rt] = eyejoytrack('holdfix', FP1, FIXATION_WINDOW, INTERVAL);
-% disp(rt);
-% return;
+toggleobject(FP1, 'status', 'off', 'eventmarker', 2);
+
 pause(STIM_INTERVAL); % Wait for eye to get used to.
-TrialRecord.TRIAL_DS.LastTrialStimTime = toc;
 p_1 = drawcircle(Point1, true); 
 p_2 = drawcircle(Point2, true);
+eventmarker(3);
 pause(0.028);
 mglactivategraphic([p_1, p_2], false);
-drawFixation(FP2);
+%toggleobject(FP2, 'status', 'on', 'eventmarker', 1);
 Point1.Position = p2;
 Point2.Position = p4;
 p_1 = drawcircle(Point1, true);
 p_2 = drawcircle(Point2, true);
-%% Start looking for keyboard
 pause(0.28);
-disp('Press Key');
-scancode = '';
-flag = 1;
-time = 0;
-tim_del = 5;
-while(flag)
-    scancode = getkeypress(tim_del/2);
-    fix_held = eyejoytrack('holdfix', FP2, FIXATION_WINDOW, tim_del/2);
-    mglactivategraphic([p_1, p_2], false);
-    if time > 5000 | scancode > 0
-       flag = 0; 
-    end
-    if time > 500 & ~fix_held
-        trialerror(BRK_FIXATION);
-        return;
-    end
-    time = time + tim_del;
+mglactivategraphic([p_1, p_2], false);
+fix_held = eyejoytrack('holdfix', FP2, FIXATION_WINDOW, 1000);
+if ~fix_held
+   trialerror(BRK_FIXATION);
+   return;
 end
+toggleobject(FP2, 'status', 'off');
+scancode = getkeypress(MAX_RXN_TIME);
 %% Was appropriate response received?
 if scancode ~= 203 & scancode ~= 205
     disp('Scancode is');
     disp(scancode);
    trialerror(NO_RESPONSE);
    disp('No or inappropriate response');
-   TrialRecord.Success = -1;
    return;
 end
 
@@ -219,7 +160,8 @@ if  scancode == 203
         TrialRecord.TRIAL_DS.PLUS = TrialRecord.TRIAL_DS.PLUS + 1;
         TrialRecord.TRIAL_DS.PLUS_TOT = TrialRecord.TRIAL_DS.PLUS_TOT + 1;
     end
-    trialerror(CORRECT);
+    eventmarker(15);
+    trialerror(0);
 elseif scancode == 205
     if TrialRecord.CurrentCondition == 1
         TrialRecord.TRIAL_DS.ZERO_TOT = TrialRecord.TRIAL_DS.ZERO_TOT + 1;
@@ -228,8 +170,10 @@ elseif scancode == 205
     else
         TrialRecord.TRIAL_DS.PLUS_TOT = TrialRecord.TRIAL_DS.PLUS_TOT + 1;
     end
-    trialerror(INCORR_RESPONSE);
+    eventmarker(15);
+    trialerror(0);
 end
+
 
 return;
 %% Functions
@@ -243,13 +187,13 @@ function id = drawcircle(Circ, isActivated)
 end
 
 
-function drawFixation(list)
-    for x = list
-        toggleobject(x, 'status', 'on'); 
-    end
-    mglrendergraphic();
-    mglpresent();
-end
+% function drawFixation(list)
+%     for x = list
+%         toggleobject(x, 'status', 'on'); 
+%     end
+%     mglrendergraphic();
+%     mglpresent();
+% end
 
 function hideFixation(list)
     for x = list
