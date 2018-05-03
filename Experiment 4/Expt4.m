@@ -10,7 +10,7 @@ Sucess = -2;
 IPT = 4;
 bhv_code(...
 1,'Fixation On',...
-2, 'Fixation Off',...
+2, 'Fixation Off',...daqregister('nidaq')
 3, 'Stimulus On',...
 4, 'Target Off',...
 21, 'C1 - Horz',...
@@ -51,7 +51,8 @@ WAIT_FOR_FIX    = 4000;
 HOLD_FIX        = 1500;                                                                                                         
 INTERVAL        = 2000;                                                                                                          
 
-STIM_INTERVAL   = 0.251;
+STIM_INTERVAL   = 0.
+251;
 %% Stimulii
 % TaskObjects from condition files
 FP1 = 1;
@@ -118,23 +119,48 @@ end
 [p1, p2, p3, p4] = get_corners([5, 5], THRESHOLD_X);
 Point1.Position = p1;
 Point2.Position = p3;
-
+jitter = randi([300 800]);
+% while jitter > -100 && jitter < 100
+%    jitter = randi([-300 300]); 
+%    % disp(jitter);
+% end
 % Hide Fixation Point 1
-toggleobject(FP1, 'status', 'off', 'eventmarker', 2);
-jitter = randi([-50, 80]);
-pause(STIM_INTERVAL + jitter/1000); % Wait for eye to get used to.
-p_1 = drawcircle(Point1, true); 
-p_2 = drawcircle(Point2, true);
-eventmarker(3);
-pause(0.028);
-mglactivategraphic([p_1, p_2], false);
-%toggleobject(FP2, 'status', 'on', 'eventmarker', 1);
-Point1.Position = p2;
-Point2.Position = p4;
-p_1 = drawcircle(Point1, true);
-p_2 = drawcircle(Point2, true);
-pause(0.28);
-mglactivategraphic([p_1, p_2], false);
+
+stim_pres_time = STIM_INTERVAL + jitter/1000;
+if stim_pres_time < 0
+    p_1 = drawcircle(Point1, true); 
+    p_2 = drawcircle(Point2, true);
+    eventmarker(3);
+    pause(0.028);
+    mglactivategraphic([p_1, p_2], false);
+    %toggleobject(FP2, 'status', 'on', 'eventmarker', 1);
+    Point1.Position = p2;
+    Point2.Position = p4;
+    p_1 = drawcircle(Point1, true);
+    p_2 = drawcircle(Point2, true);
+    pause(0.28);
+    mglactivategraphic([p_1, p_2], false);
+    pause(stim_pres_time - 0.308);
+    hideFixation_();
+end
+
+if stim_pres_time >= 0
+    toggleobject(FP1, 'status', 'off', 'eventmarker', 2);
+    pause(stim_pres_time); % Wait for eye to get used to.
+    p_1 = drawcircle(Point1, true); 
+    p_2 = drawcircle(Point2, true);
+    eventmarker(3);
+    pause(0.028);
+    mglactivategraphic([p_1, p_2], false);
+    %toggleobject(FP2, 'status', 'on', 'eventmarker', 1);
+    Point1.Position = p2;
+    Point2.Position = p4;
+    p_1 = drawcircle(Point1, true);
+    p_2 = drawcircle(Point2, true);
+    pause(0.28);
+    mglactivategraphic([p_1, p_2], false);
+end
+% pause(0.5);
 fix_held = eyejoytrack('holdfix', FP2, FIXATION_WINDOW, 2000);
 if ~fix_held
    trialerror(BRK_FIXATION);
@@ -200,8 +226,15 @@ end
 
 function hideFixation(list)
     for x = list
-        toggleobject(x, 'status', 'off'); 
+        toggleobject(x, 'status', 'off', 'eventmarker', 2); 
     end
+    toggleobject(FP1, 'status', 'off', 'eventmarker', 2);
+    mglrendergraphic();
+    mglpresent();
+end
+
+function hideFixation_()
+    toggleobject(FP1, 'status', 'off', 'eventmarker', 2);
     mglrendergraphic();
     mglpresent();
 end

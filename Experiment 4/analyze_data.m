@@ -2,7 +2,22 @@ clear
 addpath('fwdcodesiusedtoextractsaccadeandalsotoanalyzerea');
 close all
 
-X = mlread('180224_test_Expt4(7).bhv2');
+A = mlread('180226_115242_test_Expt4.bhv2');
+B = mlread('180226_115242_test_Expt4.bhv2');
+C = mlread('180226_113109_test_Expt4.bhv2');
+D = mlread('180226_113109_test_Expt4.bhv2');
+E = mlread('180226_104003_test_Expt4.bhv2');
+F = mlread('180224_test_Expt4(7).bhv2');
+G = mlread('180224_test_Expt4(6).bhv2');
+H = mlread('180226_102342_test_Expt4.bhv2');
+
+% Todays Data
+I = mlread('180227_125652_test_Expt4.bhv2');
+J = mlread('180227_131157_test_Expt4.bhv2');
+K = mlread('180226_120141_test_Expt4.bhv2');
+L = mlread('180227_134413_test_Expt4.bhv2');
+N = mlread('180227_140712_test_Expt4.bhv2');
+X = [A B C D E F G H I J K L N];
 
 flag = zeros(1,31);
 for i = 1:size(X,2)
@@ -97,19 +112,32 @@ c3_hor = cond_count(25)/(cond_count(25) + cond_count(26));
 subplot(1,3,3);
 bar([-0.25 0 0.25], [c1_hor, c2_hor, c3_hor]);
 xlabel('Conditions');
-ylabel('Horizontal Response Percentage')
+ylabel('Horizontal Response Percentage');
 
 
 fp2sacon = sac_info(:,1) - vso';
+% fp2sacon_ = fp2sacon;
 output = [fp2sacon, tri_con', tri_resp'];
 
-eye_time = sac_info(:,1);
+% eye_time = sac_info(:,1);
+% 
+% eye_mat = zeros([size(y,1), 301, size(y,3)]);
+% for i = 1:size(eye_mat, 1)
+%     if isnan(eye_time(i))
+%         start = eye_time(i)-150;
+%         end_ =eye_time(i)+150;
+%        eye_mat(i,:,:) = y(i,start:end_,:);
+%     end
+% end
 
-eye_mat = zeros([size(y,1), 301, size(y,3)]);
-for i = 1:size(eye_mat, 1)
-    if isnan(eye_time(i))
-        start = eye_time(i)-150;
-        end_ =eye_time(i)+150;
-       eye_mat(i,:,:) = y(i,start:end_,:);
-    end
+
+%% added by amir 18_02_28
+indx = find(~isnan(sac_info(:,1)));
+figure;hold on
+for tr = 1:length(indx)
+    tt = sac_info(indx(tr),1);
+    plot(-350:300,squeeze(y(indx(tr),tt-350:tt+300,1)),'b');
 end
+ylabel('dva');
+xlabel('time to sacc onset (ms)');
+title('eye position traces for 629 trials(Kiran-Shuvrajit experiment)')
